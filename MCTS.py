@@ -311,7 +311,7 @@ def human_ai():
             else:
                 parent_node = current_node.parent_node
                 grandfather_node = parent_node.parent.node
-                if parent_node.checker_board != grandfather_node.checker_board:
+                if current_node.checker_board != grandfather_node.checker_board:
                     print("该轮次您无子可落")
                 else:
                     print(f"双方均已无子可落，游戏结果为:{current_node.win_or_lose()}")
