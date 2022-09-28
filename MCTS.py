@@ -12,8 +12,8 @@ class Node:
 
     def __init__(self, parent_node, checker_board, color):
         self.parent_node = parent_node
-        self.checker_board = checker_board  # 一个二维数组，-1为黑，0为未落子，1为白。为np array
-        self.color = color  # color的逻辑仍需修改
+        self.checker_board = checker_board  # 一个二维数组，-1为黑，0为未落子，1为白。
+        self.color = color
 
     unfolding = False
     value = 0
@@ -67,7 +67,7 @@ class Node:
             return 0
 
 
-def ucb1(node, c, all_visit_number):  # 解决n=0的问题
+def ucb1(node, c, all_visit_number):
     i = 0
     max_ucb1 = -9999999
     max_pos = 0
@@ -197,9 +197,14 @@ def valid_location(node):  # 返回node的下一步所有可能落点，即所�
 
 def selection(node, all_visit_number):
     current_node = node
+    i = 0
     while not current_node.is_terminate():
-        if current_node.child_list:
-            current_node = ucb1(current_node, 2, all_visit_number)
+        if i < 128:
+            if current_node.child_list:
+                current_node = ucb1(current_node, 2, all_visit_number)
+                i += 1
+            else:
+                break
         else:
             break
     return current_node
@@ -229,7 +234,7 @@ def simulation(node, all_visit_number):
                 expansion(current_node)
                 next_node = current_node.child_list[random.randrange(0, len(current_node.child_list))]
                 current_node = next_node
-                i += 1
+            i += 1
         else:
             flag = False
             break
@@ -237,7 +242,7 @@ def simulation(node, all_visit_number):
     return flag
 
 
-def back_propagation(value_node, start_node, all_visit_number):  # 为何回溯更新不是从终局结点开始，而是从select_end开始
+def back_propagation(value_node, start_node, all_visit_number):
     value_node.value = value_node.win_or_lose()
     current_node = start_node
     while current_node is not None:
@@ -281,13 +286,14 @@ def main():
             if len(current_node.child_list) == 1:
                 parent_node = current_node.parent_node
                 grandfather_node = parent_node.parent_node
-                if np.allclose(parent_node.checker_board, grandfather_node.checker_board):
+                if np.array_equal(grandfather_node.checker_board, current_node.checker_board):
                     print("双方均已无子可落")
                     break
     print(current_node.win_or_lose())
     end_time = datetime.datetime.now()
     print(f"开始时间：{start_time}")
     print(f"结束时间：{end_time}")
+    return current_node.win_or_lose()
 
 
 def human_ai():
@@ -297,7 +303,7 @@ def human_ai():
     i = 0
     next_node = None
     while not current_node.is_terminate():
-        if (i % 2 == 0):
+        if i % 2 == 0:
             next_node = choose_better(current_node, all_visit_number)
             current_node = next_node
             print(next_node.checker_board)
@@ -321,8 +327,28 @@ def human_ai():
     print(current_node.win_or_lose())
 
 
-choose = int(input("你是想和机器对战（0）还是让机器自己对战（1）？"))
-if choose == 0:
+def loop():
+    record = []
+    for i in range(0, 200):
+        a = main()
+        print(f"第{i}次结束时间为：{datetime.datetime.now()}")
+        record.append(a)
+        print(record)
+    black_win = 0
+    write_win = 0
+    double_win = 0
+    for j in range(0, len(record)):
+        if record[j] == -1:
+            black_win += 1
+        elif record[j] == 1:
+            write_win += 1
+        else:
+            double_win += 1
+    print(f"黑胜：{black_win},白胜：{write_win},平局：{double_win}")
+
+
+a = int(input("你想和机器对战(0)，还是让机器自己对战(1)"))
+if a == 0:
     human_ai()
-else:
+elif a == 1:
     main()
