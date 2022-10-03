@@ -76,9 +76,9 @@ def ucb1(node, c, all_visit_number):
         if a.visit_number != 0:
             ave_value = a.value / a.visit_number
             if node.color == -1:
-                ucb1_value = c * sqrt(2 * log(all_visit_number) / a.visit_number) + ave_value
-            else:
                 ucb1_value = -(c * sqrt(2 * log(all_visit_number) / a.visit_number) + ave_value)
+            else:
+                ucb1_value = c * sqrt(2 * log(all_visit_number) / a.visit_number) + ave_value
         else:
             ucb1_value = 10000
         if ucb1_value > max_ucb1:
